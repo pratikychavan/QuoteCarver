@@ -107,7 +107,7 @@ class MyWidget(QtWidgets.QWidget):
             )
             painter.end()
 
-            combined_image_path = "combined_image.png"
+            combined_image_path = "new_combined_image.png"
             base_image.save(combined_image_path)
 
             return combined_image_path
