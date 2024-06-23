@@ -42,8 +42,8 @@ class MyWidget(QtWidgets.QWidget):
         px = QPixmap(self.image_location)
         self.preview_label.setPixmap(
             px.scaled(
-                s=self.preview_label.size(), 
-                aspectMode=QtCore.Qt.KeepAspectRatio
+                self.preview_label.size(), 
+                QtCore.Qt.KeepAspectRatio
                 )
             )
 
@@ -63,8 +63,8 @@ class MyWidget(QtWidgets.QWidget):
                 pixmap = QPixmap(combined_image_path)
                 self.preview_label.setPixmap(
                     pixmap.scaled(
-                        s=self.preview_label.size(), 
-                        aspectMode=QtCore.Qt.KeepAspectRatio
+                        self.preview_label.size(), 
+                        QtCore.Qt.KeepAspectRatio
                         )
                     )
 
@@ -75,22 +75,22 @@ class MyWidget(QtWidgets.QWidget):
                 raise ValueError("Cannot load image")
 
             painter = QPainter(base_image)
-            initial_font_size = 30
-            font = QFont('Arial', initial_font_size)
+            initial_font_size = 300
+            font = QFont('Z003', initial_font_size)
             painter.setFont(font)
             painter.setPen(QColor('white'))
 
             line_count = len(quote.splitlines())
-            text = f'"{quote}"\n- {author}' if author else f'"{quote}"'
+            text = f'"{quote}"\n\n- {author}' if author else f'"{quote}"'
             im_height = base_image.height()
             im_width = base_image.width()
             text_rect = QtCore.QRect(50, im_height/2 + 50*(line_count/2) , im_width - 50, im_height/2 - 50*(line_count/2))
             
             while True:
                 bounding_rect = painter.boundingRect(
-                    rect=text_rect, 
-                    flags=QtCore.Qt.AlignCenter, 
-                    text=text
+                    text_rect, 
+                    QtCore.Qt.AlignCenter, 
+                    text
                     )
                 if bounding_rect.height() <= text_rect.height() and bounding_rect.width() <= text_rect.width():
                     break
@@ -101,9 +101,9 @@ class MyWidget(QtWidgets.QWidget):
                 painter.setFont(font)
 
             painter.drawText(
-                r=text_rect, 
-                flags=QtCore.Qt.AlignCenter, 
-                text=text
+                text_rect, 
+                QtCore.Qt.AlignCenter, 
+                text
             )
             painter.end()
 
