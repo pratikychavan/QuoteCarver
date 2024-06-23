@@ -9,20 +9,16 @@ class MyWidget(QtWidgets.QWidget):
 
         self.setWindowTitle("Quote Carver")
 
-        self.heading = QLabel("Quote Carver", alignment=QtCore.Qt.AlignmentFlag.AlignHCenter)
         self.load_image_button = QPushButton("Load Image")
         self.generate_image_button = QPushButton("Generate Image")
 
         self.layout = QFormLayout(self)
-        self.image_location = QLineEdit()
-        self.image_location.setReadOnly(True)
+        self.image_location = ""
         self.quote = QTextEdit()
         self.author = QLineEdit()
-        self.preview_label = QLabel(self)  # Label to display the preview
-        self.preview_label.setFixedSize(400, 400)  # Set the size of the preview label
+        self.preview_label = QLabel(self) 
+        self.preview_label.setFixedSize(600, 400)
 
-        self.layout.addWidget(self.heading)
-        self.layout.addRow(QLabel("Image location"), self.image_location)
         self.layout.addRow(self.load_image_button)
         self.layout.addRow(QLabel("Quote"), self.quote)
         self.layout.addRow(QLabel("Author"), self.author)
@@ -35,13 +31,13 @@ class MyWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def load_image(self):
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif);;All Files (*)", options=options)
-        if file_name:
-            self.image_location.setText(file_name)
+        self.image_location, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif);;All Files (*)", options=options)
+        px = QPixmap(self.image_location)
+        self.preview_label.setPixmap(px.scaled(self.preview_label.size(), QtCore.Qt.KeepAspectRatio))
 
     @QtCore.Slot()
     def magic(self):
-        image_path = self.image_location.text()
+        image_path = self.image_location
         quote_text = self.quote.toPlainText()
         author_text = self.author.text()
 
@@ -67,7 +63,7 @@ class MyWidget(QtWidgets.QWidget):
             text = f'"{quote}"\n- {author}'
             im_height = base_image.height()
             im_width = base_image.width()
-            text_rect = QtCore.QRect(50, im_height/2 + 50*(line_count/2) , base_image.width() - 100, im_height/2 - 50*(line_count/2))
+            text_rect = QtCore.QRect(50, im_height/2 + 50*(line_count/2) , im_width - 50, im_height/2 - 50*(line_count/2))
             
             while True:
                 bounding_rect = painter.boundingRect(text_rect, QtCore.Qt.AlignCenter, text)
