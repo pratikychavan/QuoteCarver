@@ -1,6 +1,7 @@
+import os
 import sys
-from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtWidgets import QLabel, QPushButton, QLineEdit, QTextEdit, QFormLayout, QFileDialog, QVBoxLayout, QWidget
+from PySide6 import QtCore, QtWidgets
+from PySide6.QtWidgets import QLabel, QPushButton, QLineEdit, QTextEdit, QFormLayout, QFileDialog
 from PySide6.QtGui import QPixmap, QPainter, QFont, QColor
 
 class MyWidget(QtWidgets.QWidget):
@@ -31,9 +32,20 @@ class MyWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def load_image(self):
         options = QFileDialog.Options()
-        self.image_location, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif);;All Files (*)", options=options)
+        self.image_location, _ = QFileDialog.getOpenFileName(
+            self, 
+            caption="Open Image File", 
+            dir=os.path.expanduser("~"), 
+            filter="Images (*.png *.jpg *.jpeg *.bmp *.gif);;All Files (*)", 
+            options=options
+        )
         px = QPixmap(self.image_location)
-        self.preview_label.setPixmap(px.scaled(self.preview_label.size(), QtCore.Qt.KeepAspectRatio))
+        self.preview_label.setPixmap(
+            px.scaled(
+                s=self.preview_label.size(), 
+                aspectMode=QtCore.Qt.KeepAspectRatio
+                )
+            )
 
     @QtCore.Slot()
     def magic(self):
@@ -42,10 +54,19 @@ class MyWidget(QtWidgets.QWidget):
         author_text = self.author.text()
 
         if image_path and quote_text:
-            combined_image_path = self.create_quote_image(image_path, quote_text, author_text)
+            combined_image_path = self.create_quote_image(
+                image_path=image_path, 
+                quote=quote_text, 
+                author=author_text
+            )
             if combined_image_path:
                 pixmap = QPixmap(combined_image_path)
-                self.preview_label.setPixmap(pixmap.scaled(self.preview_label.size(), QtCore.Qt.KeepAspectRatio))
+                self.preview_label.setPixmap(
+                    pixmap.scaled(
+                        s=self.preview_label.size(), 
+                        aspectMode=QtCore.Qt.KeepAspectRatio
+                        )
+                    )
 
     def create_quote_image(self, image_path, quote, author):
         try:
@@ -60,13 +81,17 @@ class MyWidget(QtWidgets.QWidget):
             painter.setPen(QColor('white'))
 
             line_count = len(quote.splitlines())
-            text = f'"{quote}"\n- {author}'
+            text = f'"{quote}"\n- {author}' if author else f'"{quote}"'
             im_height = base_image.height()
             im_width = base_image.width()
             text_rect = QtCore.QRect(50, im_height/2 + 50*(line_count/2) , im_width - 50, im_height/2 - 50*(line_count/2))
             
             while True:
-                bounding_rect = painter.boundingRect(text_rect, QtCore.Qt.AlignCenter, text)
+                bounding_rect = painter.boundingRect(
+                    rect=text_rect, 
+                    flags=QtCore.Qt.AlignCenter, 
+                    text=text
+                    )
                 if bounding_rect.height() <= text_rect.height() and bounding_rect.width() <= text_rect.width():
                     break
                 initial_font_size -= 1
@@ -75,7 +100,11 @@ class MyWidget(QtWidgets.QWidget):
                 font.setPointSize(initial_font_size)
                 painter.setFont(font)
 
-            painter.drawText(text_rect, QtCore.Qt.AlignCenter, text)
+            painter.drawText(
+                r=text_rect, 
+                flags=QtCore.Qt.AlignCenter, 
+                text=text
+            )
             painter.end()
 
             combined_image_path = "combined_image.png"
